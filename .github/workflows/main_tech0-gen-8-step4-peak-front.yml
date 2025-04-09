@@ -32,8 +32,7 @@ jobs:
       - name: Zip artifact for deployment
         run: |
           mkdir deployment
-          cp -r build/* deployment/  # ビルド成果物のみコピー
-          cp package*.json deployment/
+          cp -r .next public package*.json next.config.js deployment/
           cd deployment && zip -r ../release.zip .
 
       - name: Upload artifact for deployment job
