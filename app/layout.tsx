@@ -5,6 +5,7 @@ import "./globals.css"
 import Footer from "@/components/footer"
 import Header from "@/components/header"
 import { ImageProvider } from "@/lib/image-context"
+import { ToastProvider } from "@/hooks/toast-provider" // ← use-toast.ts ではなくこちら
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -15,7 +16,7 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "リフォトル - リフォームイメージ作成",
   description: "リフォームのイメージを簡単に作成できるサービス",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -27,17 +28,15 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${notoSansJP.variable} font-sans`}>
         <ImageProvider>
-          <Header />
-          <main className="min-h-screen flex flex-col main-content">
-            <div className="flex-grow">{children}</div>
-            <Footer />
-          </main>
+          <ToastProvider> {/* ← ここで囲む */}
+            <Header />
+            <main className="min-h-screen flex flex-col main-content">
+              <div className="flex-grow">{children}</div>
+              <Footer />
+            </main>
+          </ToastProvider>
         </ImageProvider>
       </body>
     </html>
   )
 }
-
-
-
-import './globals.css'
