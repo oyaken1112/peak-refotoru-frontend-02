@@ -29,21 +29,22 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
-      - name: Copy artifact for deployment job 
+      - name: Prepare deployment package
         run: |
-          mkdir deploy
-          cp -r ./.next/standalone/. ./deploy
-          cp -r ./public ./deploy
-          cp -r ./.next/static/. ./deploy/.next/static
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./deploy -r
+          mkdir -p deploy/.next/static
+          cp -r ./.next/standalone/. ./deploy/
+          cp -r ./public ./deploy/
+          cp -r ./.next/static/. ./deploy/.next/static/
+          # 確認のためのリスト表示
+          echo "Deployment package contents:"
+          ls -la ./deploy/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: release.zip
+          path: deploy
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,9 +58,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+          path: deploy
+      
+      - name: Display structure of downloaded files
+        run: ls -R ./deploy
       
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -69,3 +71,4 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D10926EE9B724BE1AC7DDDD4270BF094 }}
+          timeout-minutes: 30
